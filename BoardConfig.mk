@@ -109,7 +109,7 @@ WIFI_DRIVER_MODULE_PATH := "/system/lib/modules/ath6kl_sdio.ko"
 WIFI_DRIVER_MODULE_ARG := "suspend_mode=3 wow_mode=2 ath6kl_p2p=1 recovery_enable=1"
 
 ## RIL
-BOARD_RIL_CLASS := ../../../device/samsung/delos3geur/ril/
+#BOARD_RIL_CLASS := ../../../device/samsung/delos3geur/ril/
 
 ## Vold
 BOARD_VOLD_MAX_PARTITIONS := 24
