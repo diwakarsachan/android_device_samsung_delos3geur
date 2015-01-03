@@ -15,84 +15,138 @@
 # BoardConfig.mk
 #
 
-## Kernel, bootloader etc.
+TARGET_SPECIFIC_HEADER_PATH := device/samsung/delos3geur/include
+
+# cflags
+COMMON_GLOBAL_CFLAGS += -DQCOM_BSP_ABI_HACK -DUSE_MDP3
+COMMON_GLOBAL_CFLAGS += -DLPA_DEFAULT_BUFFER_SIZE=480
+TARGET_GLOBAL_CFLAGS += -mfpu=neon-vfpv4 -mfloat-abi=softfp
+TARGET_GLOBAL_CPPFLAGS += -mfpu=neon-vfpv4 -mfloat-abi=softfp
+
 TARGET_NO_BOOTLOADER := true
 TARGET_NO_RADIOIMAGE := true
-TARGET_KERNEL_SOURCE := device/samsung/delos3geur-kernel
-TARGET_KERNEL_CONFIG := cyanogen_delos3geur_defconfig
+# Try to use ASHMEM if possible (when non-MDP composition is used)
+TARGET_GRALLOC_USES_ASHMEM := true
 
-BOARD_KERNEL_CMDLINE := androidboot.hardware=qcom loglevel=1 vmalloc=200M
+# Arch related defines and optimizations
+TARGET_ARCH := arm
+TARGET_CPU_ABI  := armeabi-v7a
+TARGET_CPU_ABI2 := armeabi
+TARGET_CPU_VARIANT := cortex-a5
+TARGET_ARCH_VARIANT := armv7-a-neon
+TARGET_BOARD_PLATFORM := msm7x27a
+TARGET_BOOTLOADER_BOARD_NAME := msm8625
+TARGET_CPU_SMP := true
+
+TARGET_CORTEX_CACHE_LINE_32 := true
+#TARGET_USE_QCOM_BIONIC_OPTIMIZATION := true
+
+TARGET_BOARD_PLATFORM_GPU := qcom-adreno203
+BOARD_USES_ADRENO_203 := true
+TARGET_KERNEL_SOURCE := device/samsung/delos3geur-kernel
+
+TARGET_KERNEL_CONFIG := cyanogen_delos3geur_defconfig
 BOARD_KERNEL_BASE := 0x00200000
 BOARD_MKBOOTIMG_ARGS := --ramdisk_offset 0x01300000
 BOARD_KERNEL_PAGESIZE := 4096
+TARGET_USES_UNCOMPRESSED_KERNEL := false
 
-## Platform
-TARGET_ARCH := arm
-TARGET_ARCH_VARIANT := armv7-a-neon
-TARGET_ARCH_LOWMEM := true
-TARGET_BOARD_PLATFORM := msm7x27a
-TARGET_BOARD_PLATFORM_GPU := qcom-adreno200
-TARGET_CPU_ABI := armeabi-v7a
-TARGET_CPU_ABI2 := armeabi
-TARGET_CPU_VARIANT := cortex-a5
-
-TARGET_BOOTLOADER_BOARD_NAME := MSM8225
-
-TARGET_SPECIFIC_HEADER_PATH := device/samsung/delos3geur/include
-
-#TARGET_USE_QCOM_BIONIC_OPTIMIZATION := true
-
+BOARD_KERNEL_CMDLINE := androidboot.hardware=qcom loglevel=1 vmalloc=200M androidboot.selinux=permissive
 ARCH_ARM_HAVE_TLS_REGISTER := true
-
-TARGET_GLOBAL_CFLAGS += -mtune=cortex-a5 -mfpu=neon-vfpv4 -mfloat-abi=softfp
-TARGET_GLOBAL_CPPFLAGS += -mtune=cortex-a5 -mfpu=neon-vfpv4 -mfloat-abi=softfp
-
-## FM Radio
+BOARD_EGL_CFG := device/samsung/delos3geur/prebuilt/system/lib/egl/egl.cfg
+## Partition sizes
+BOARD_BOOTIMAGE_PARTITION_SIZE := 12288000
+BOARD_RECOVERYIMAGE_PARTITION_SIZE := 12288000
+BOARD_SYSTEMIMAGE_PARTITION_SIZE := 1228800000
+BOARD_USERDATAIMAGE_PARTITION_SIZE := 5573804032
+BOARD_CACHEIMAGE_PARTITION_SIZE := 737280000
+BOARD_FLASH_BLOCK_SIZE := 131072
+# FM
 BOARD_HAVE_QCOM_FM := true
 COMMON_GLOBAL_CFLAGS += -DQCOM_FM_ENABLED
 
-## Memory
-TARGET_USES_ION := true
-BOARD_NEEDS_MEMORYHEAPPMEM := true
-BOARD_USE_MHEAP_SCREENSHOT := true
-
-## Camera
-TARGET_DISABLE_ARM_PIE := true
-COMMON_GLOBAL_CFLAGS += -DBINDER_COMPAT -DNEEDS_VECTORIMPL_SYMBOLS -DSAMSUNG_CAMERA_LEGACY
-
-## Qualcomm hardware
-TARGET_QCOM_DISPLAY_VARIANT := legacy
-TARGET_QCOM_MEDIA_VARIANT := caf
-COMMON_GLOBAL_CFLAGS += -DQCOM_LEGACY_MMPARSE
+# Audio
 TARGET_QCOM_AUDIO_VARIANT := caf
+TARGET_PROVIDES_LIBAUDIO := true
+BOARD_QCOM_VOIP_ENABLED := true
 BOARD_USES_LEGACY_ALSA_AUDIO := true
-COMMON_GLOBAL_CFLAGS += -DNO_TUNNELED_SOURCE
+TARGET_HAS_QACT := true
+
+# Bluetooth
+BOARD_HAVE_BLUETOOTH := true
+BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR := device/samsung/delos3geur/bluetooth
+# Dalvik
+TARGET_ARCH_LOWMEM := true
+
+# Display
 BOARD_USES_QCOM_HARDWARE := true
-COMMON_GLOBAL_CFLAGS += -DQCOM_HARDWARE -DNO_TUNNEL_RECORDING
-
-## EGL, graphics
-USE_OPENGL_RENDERER := true
-TARGET_DOESNT_USE_FENCE_SYNC := true
 BOARD_ADRENO_DECIDE_TEXTURE_TARGET := true
-BOARD_EGL_CFG := device/samsung/delos3geur/prebuilt/system/lib/egl/egl.cfg
-
-## Qualcomm BSP
+TARGET_QCOM_DISPLAY_VARIANT := legacy
+USE_OPENGL_RENDERER := true
+TARGET_USES_ION := true
+#TARGET_USES_QCOM_BSP := true
+#TARGET_DISPLAY_USE_RETIRE_FENCE := true
+BOARD_USE_MHEAP_SCREENSHOT := true
+HWUI_COMPILE_FOR_PERF := true
 COMMON_GLOBAL_CFLAGS += -DQCOM_BSP
 
-## GPS
+# Hardware
+BOARD_HARDWARE_CLASS := device/samsung/delos3geur/cmhw
+
+# BIONIC
+#TARGET_USE_QCOM_BIONIC_OPTIMIZATION := true
+
+# Add QC Video Enhancements flag
+TARGET_ENABLE_QC_AV_ENHANCEMENTS := true
+
+# SEPOLICY
+BOARD_SEPOLICY_DIRS := \
+       device/samsung/delos3geur/sepolicy
+
+BOARD_SEPOLICY_UNION := \
+       device.te \
+       app.te \
+       file_contexts
+
+# EGL
+BOARD_EGL_WORKAROUND_BUG_10194508 := true
+BOARD_EGL_CFG := device/samsung/delos3geur/prebuilt/system/lib/egl/egl.cfg
+
+# Media
+TARGET_QCOM_MEDIA_VARIANT := caf
+COMMON_GLOBAL_CFLAGS += -DLPA_DEFAULT_BUFFER_SIZE=480
+TARGET_QCOM_LEGACY_MMPARSER := true
+
+# Storage / Sharing
+BOARD_VOLD_EMMC_SHARES_DEV_MAJOR := true
+TARGET_USE_CUSTOM_LUN_FILE_PATH := /sys/class/android_usb/android0/f_mass_storage/lun%d/file
+
+# GPS
+QCOM_GPS_PATH := hardware/qcom/gps
 BOARD_USES_QCOM_LIBRPC := true
 BOARD_USES_QCOM_GPS := true
-BOARD_VENDOR_QCOM_GPS_LOC_API_HARDWARE := msm7x27a
 BOARD_VENDOR_QCOM_GPS_LOC_API_AMSS_VERSION := 50000
+BOARD_VENDOR_QCOM_GPS_LOC_API_HARDWARE := $(TARGET_BOARD_PLATFORM)
 
-## Webkit
+TARGET_BOOTANIMATION_PRELOAD := true
+TARGET_BOOTANIMATION_TEXTURE_CACHE := true
+
+TARGET_PROVIDES_LIBLIGHT := true
+
+# Camera
+USE_CAMERA_STUB := true
+COMMON_GLOBAL_CFLAGS += -DQCOM_BSP_WITH_GENLOCK -DNEEDS_VECTORIMPL_SYMBOLS
+USE_DEVICE_SPECIFIC_CAMERA := true
+
+# Webkit
+ENABLE_WEBGL := true
 #PRODUCT_PREBUILT_WEBVIEWCHROMIUM := yes
-#TARGET_FORCE_CPU_UPLOAD := true
-#ENABLE_WEBGL := true
+TARGET_FORCE_CPU_UPLOAD := true
 
-## Bluetooth
-BOARD_HAVE_BLUETOOTH := true
-BOARD_HAVE_BLUETOOTH_CSR := true
+DISABLE_DEXPREOPT := true
+
+# RIL
+BOARD_RIL_CLASS := ../../../device/samsung/delos3geur/ril/
 
 ## Wi-Fi
 BOARD_WLAN_DEVICE := ath6kl
@@ -108,26 +162,14 @@ WIFI_DRIVER_MODULE_NAME := "ath6kl_sdio"
 WIFI_DRIVER_MODULE_PATH := "/system/lib/modules/ath6kl_sdio.ko"
 WIFI_DRIVER_MODULE_ARG := "suspend_mode=3 wow_mode=2 ath6kl_p2p=1 recovery_enable=1"
 
-## RIL
-#BOARD_RIL_CLASS := ../../../device/samsung/delos3geur/ril/
-
+#Boot
+TARGET_BOOTANIMATION_PRELOAD := true
+TARGET_BOOTANIMATION_TEXTURE_CACHE := true
 ## Vold
 BOARD_VOLD_MAX_PARTITIONS := 24
 
-## UMS
-TARGET_USE_CUSTOM_LUN_FILE_PATH := /sys/devices/platform/msm_hsusb/gadget/lun%d/file
-BOARD_UMS_LUNFILE := "/sys/devices/platform/msm_hsusb/gadget/lun%d/file"
-
 ## Samsung has weird framebuffer
 TARGET_NO_INITLOGO := true
-
-## Use device specific modules
-TARGET_PROVIDES_LIBLIGHT := true
-TARGET_PROVIDES_LIBAUDIO := true
-
-## Power
-TARGET_USES_CM_POWERHAL := true
-
 ## Recovery
 TARGET_RECOVERY_FSTAB := device/samsung/delos3geur/ramdisk/fstab.qcom
 TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
@@ -144,16 +186,11 @@ BOARD_CACHE_DEVICE := /dev/block/mmcblk0p22
 BOARD_CACHE_FILESYSTEM := ext4
 BOARD_CACHE_FILESYSTEM_OPTIONS := rw
 
-## Partition sizes
-BOARD_BOOTIMAGE_PARTITION_SIZE := 12582912
-BOARD_RECOVERYIMAGE_PARTITION_SIZE := 12582912
-BOARD_SYSTEMIMAGE_PARTITION_SIZE := 1258291200
-BOARD_USERDATAIMAGE_PARTITION_SIZE := 5573804032
-
 ## Other Features
 TARGET_USERIMAGES_USE_EXT4 := true
-BOARD_HAS_SDCARD_INTERNAL := true
-BOARD_HAS_DOWNLOAD_MODE := true
-BOARD_USES_MMCUTILS := true
-BOARD_HAS_NO_MISC_PARTITION := true
-BOARD_FLASH_BLOCK_SIZE := 131072
+#BOARD_HAS_SDCARD_INTERNAL := true
+#BOARD_HAS_DOWNLOAD_MODE := true
+#BOARD_USES_MMCUTILS := true
+#BOARD_HAS_NO_MISC_PARTITION := true
+BOARD_NO_SPEAKER := true
+

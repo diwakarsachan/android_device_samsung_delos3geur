@@ -35,7 +35,6 @@ persist.radio.multisim.config=dsds
 persist.multisim.config=dsds
 
 DEVICE_PROVISIONED=1
-keyguard.no_require_sim=1
 debug.sf.hw=1
 debug.composition.7x27A.type=mdp
 debug.composition.7x25A.type=mdp
