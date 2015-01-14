@@ -27,10 +27,11 @@
 #
 
 target=`getprop ro.board.platform`
+target_device=`getprop ro.product.device`
+
 case "$target" in
     "msm7201a_ffa" | "msm7201a_surf" | "msm7627_ffa" | "msm7627_6x" | "msm7627a"  | "msm7627_surf" | \
-    "qsd8250_surf" | "qsd8250_ffa" | "msm7630_surf" | "msm7630_1x" | "msm7630_fusion" | "qsd8650a_st1x" | \
-    "msm8625")
+    "qsd8250_surf" | "qsd8250_ffa" | "msm7630_surf" | "msm7630_1x" | "msm7630_fusion" | "qsd8650a_st1x")
         echo "ondemand" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
         echo 90 > /sys/devices/system/cpu/cpufreq/ondemand/up_threshold
         ;;
@@ -49,16 +50,19 @@ case "$target" in
         ;;
 esac
 
+case "$target_device" in
+     # MSM7627, MSM8625 (CDMA) only 
+     "aruba3gduosctc" | "kyleplus3gctc" | "infinite3gduosctc" | "baffin3gduosctc")
+        echo 196608 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+        ;;
+     *)
+     # Not CDMA
 case "$target" in
-     "msm7201a_ffa" | "msm7201a_surf" | "msm7627_ffa" | "msm7627_6x" | "msm7627_surf" | "msm7630_surf" | "msm7630_1x" | "msm7630_fusion" | "msm7627a" | "msm8625")
+     "msm7201a_ffa" | "msm7201a_surf" | "msm7627_ffa" | "msm7627_6x" | "msm7627_surf" | "msm7630_surf" | "msm7630_1x" | "msm7630_fusion" | "msm7627a" )
         echo 245760 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
         ;;
 esac
-
-case "$target" in
-    "msm7627a" | "msm8625")
-	 echo 1 > /sys/devices/system/cpu/cpufreq/ondemand/io_is_busy
-	 ;;
+        ;;
 esac
 
 case "$target" in
@@ -193,7 +197,7 @@ case "$target" in
 esac
 
 case "$target" in
-    "qsd8650a_st1x")
+    "qsd8650a_st1x" | "msm7627a")
         mount -t debugfs none /sys/kernel/debug
     ;;
 esac
@@ -216,35 +220,23 @@ case "$target" in
     "msm8960" | "msm8660" | "msm7630_surf")
         echo 10 > /sys/devices/platform/msm_sdcc.3/idle_timeout
         ;;
-    "msm7627a" | "msm8625")
+    "msm7627a")
         echo 10 > /sys/devices/platform/msm_sdcc.1/idle_timeout
         ;;
 esac
 
-# Post-setup services
-case "$target" in
-    "msm8660" | "msm8960")
-        start mpdecision
-    ;;
-    "msm7627a" | "msm8625")
-        soc_id=`cat /sys/devices/system/soc/soc0/id`
-        case "$soc_id" in
-            "127" | "128" | "129" | "137" | "167" | "168" | "169" | "170" )
-                start mpdecision
-                start thermald
-        ;;
-        esac
-    ;;
-esac
-
 # Enable Power modes and set the CPU Freq Sampling rates
 case "$target" in
-     "msm7627a" | "msm8625")
+     "msm7627a")
         start qosmgrd
-	echo 1 > /sys/module/pm2/modes/cpu0/standalone_power_collapse/idle_enabled
-	echo 1 > /sys/module/pm2/modes/cpu1/standalone_power_collapse/idle_enabled
+	echo 0 > /sys/module/pm2/modes/cpu0/standalone_power_collapse/idle_enabled
+	echo 0 > /sys/module/pm2/modes/cpu1/standalone_power_collapse/idle_enabled
+	echo 0 > /sys/module/pm2/modes/cpu2/standalone_power_collapse/idle_enabled
+	echo 0 > /sys/module/pm2/modes/cpu3/standalone_power_collapse/idle_enabled
 	echo 1 > /sys/module/pm2/modes/cpu0/standalone_power_collapse/suspend_enabled
 	echo 1 > /sys/module/pm2/modes/cpu1/standalone_power_collapse/suspend_enabled
+	echo 1 > /sys/module/pm2/modes/cpu2/standalone_power_collapse/suspend_enabled
+	echo 1 > /sys/module/pm2/modes/cpu3/standalone_power_collapse/suspend_enabled
 	#SuspendPC:
 	echo 1 > /sys/module/pm2/modes/cpu0/power_collapse/suspend_enabled
 	#IdlePC:
@@ -253,9 +245,35 @@ case "$target" in
     ;;
 esac
 
+# Post-setup services
+case "$target" in
+    "msm8660" | "msm8960")
+        start mpdecision
+    ;;
+    "msm7627a")
+        soc_id=`cat /sys/devices/system/soc/soc0/id`
+        ver=`cat /sys/devices/system/soc/soc0/version`
+        case "$soc_id" in
+            "127" | "128" | "129" | "137" | "167" )
+                start mpdecision
+                if [ "$ver" = "2.0" ]; then
+                        start thermald
+                fi
+        ;;
+        esac
+        case "$soc_id" in
+            "168" | "169" | "170" )
+                start mpdecision
+                start thermald
+	;;
+	esac
+    ;;
+esac
+
+
 # Change adj level and min_free_kbytes setting for lowmemory killer to kick in
 case "$target" in
-     "msm7627a" | "msm8625")
+     "msm7627a")
 	echo 0,1,2,4,9,12 > /sys/module/lowmemorykiller/parameters/adj
 	echo 5120 > /proc/sys/vm/min_free_kbytes
      ;;

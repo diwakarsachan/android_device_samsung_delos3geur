@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+$(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
+$(call inherit-product, device/common/gps/gps_eu_supl.mk)
 $(call inherit-product, frameworks/native/build/phone-hdpi-512-dalvik-heap.mk)
 
 $(call inherit-product, $(SRC_TARGET_DIR)/product/languages_full.mk)
@@ -24,6 +26,7 @@ PRODUCT_LOCALES := en_US
 PRODUCT_LOCALES += hdpi
 PRODUCT_AAPT_CONFIG := normal hdpi
 PRODUCT_AAPT_PREF_CONFIG := hdpi
+PRODUCT_TAGS += dalvik.gc.type-precise
 
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.camera.flash-autofocus.xml:system/etc/permissions/android.hardware.camera.flash-autofocus.xml \
@@ -47,6 +50,60 @@ frameworks/native/data/etc/android.hardware.location.xml:system/etc/permissions/
     frameworks/native/data/etc/android.hardware.usb.accessory.xml:system/etc/permissions/android.hardware.usb.accessory.xml \
     frameworks/native/data/etc/android.hardware.usb.host.xml:system/etc/permissions/android.hardware.usb.host.xml \
     frameworks/native/data/etc/android.hardware.sensor.light.xml:system/etc/permissions/android.hardware.sensor.light.xml 
+
+## rild
+PRODUCT_PACKAGES := \
+    rild \
+    BasicSmsReceiver
+
+## Video
+PRODUCT_PACKAGES += \
+    libstagefrighthw \
+    libmm-omxcore \
+    libOmxCore
+
+## Graphics
+PRODUCT_PACKAGES += \
+    copybit.msm7x27a \
+    gralloc.msm7x27a \
+    hwcomposer.msm7x27a \
+    libtilerenderer
+
+## Misc.
+PRODUCT_PACKAGES += \
+    make_ext4fs \
+    setup_fs \
+    com.android.future.usb.accessory
+
+## Audio
+PRODUCT_PACKAGES += \
+    audio.primary.msm7x27a \
+    audio_policy.msm7x27a \
+    audio.a2dp.default \
+    audio.usb.default \
+    audio_policy.conf \
+    libaudioutils
+
+## Other HALs
+PRODUCT_PACKAGES += \
+    camera.msm7x27a \
+    lights.msm7x27a \
+    gps.msm7x27a \
+    power.msm7x27a
+
+## FM radio
+PRODUCT_PACKAGES += \
+    qcom.fmradio \
+    libqcomfm_jni \
+    FM2
+
+## Bluetooth
+PRODUCT_PACKAGES += \
+    haltest \
+    hciattach \
+    hciconfig \
+    hcitool \
+    bccmd
 
 PRODUCT_PACKAGES += \
     hostapd.accept \
@@ -143,17 +200,6 @@ PRODUCT_PACKAGES += \
     libOmxVenc \
     qcmediaplayer
 
-# stagefright cmdline tools
-PRODUCT_PACKAGES += \
-    stagefright \
-    record \
-    recordvideo \
-    audioloop \
-    stream \
-    sf2 \
-    codec \
-    muxer
-
 # Camera Hal
 # PRODUCT_PACKAGES += \
 #    camera.msm7x27a
@@ -174,26 +220,10 @@ PRODUCT_PACKAGES += \
   Link2SDV \
   3DWallpaper 
 
-#Test Add
-PRODUCT_PACKAGES += \
-  AtCmdFwd \
-  bccmd
-
-# SELinux packages
-PRODUCT_PACKAGES += \
-    auditd \
-    sepolicy \
-    file_contexts \
-    seapp_contexts \
-    property_contexts \
-    mac_permissions.xml
 
 # Ramdisk
 PRODUCT_COPY_FILES += \
     $(call find-copy-subdir-files,*,device/samsung/delos3geur/ramdisk,root)
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/rootdir/recovery/sbin/rmt_storage_recovery:recovery/root/sbin/rmt_storage_recovery \
-    $(LOCAL_PATH)/rootdir/recovery/sbin/postrecoveryboot.sh:recovery/root/sbin/postrecoveryboot.sh
 
 ## Prebuilt
 PRODUCT_COPY_FILES += \
