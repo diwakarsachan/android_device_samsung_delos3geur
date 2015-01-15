@@ -351,7 +351,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	ro.carrier=unknown 
 
 $(call inherit-product, build/target/product/full.mk)
-$(call inherit-product, vendor/samsung/delos3geur/vendor.mk)
+#$(call inherit-product, vendor/samsung/delos3geur/vendor.mk)
 
 ## Other
 PRODUCT_BUILD_PROP_OVERRIDES += BUILD_UTC_DATE=0
