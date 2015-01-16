@@ -139,9 +139,6 @@ WIFI_DRIVER_MODULE_NAME := "ath6kl_sdio"
 WIFI_DRIVER_MODULE_PATH := "/system/lib/modules/ath6kl_sdio.ko"
 WIFI_DRIVER_MODULE_ARG := "suspend_mode=3 wow_mode=2 ath6kl_p2p=1 recovery_enable=1"
 
-## RIL
-BOARD_RIL_CLASS := ../../../device/samsung/delos3geur/ril/
-
 ## Vold
 BOARD_VOLD_MAX_PARTITIONS := 24
 
@@ -158,11 +155,6 @@ TARGET_PROVIDES_LIBAUDIO := true
 
 ## Power
 TARGET_USES_CM_POWERHAL := true
-
-## Recovery
-TARGET_RECOVERY_FSTAB := device/samsung/delos3geur/ramdisk/fstab.qcom
-TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
-RECOVERY_FSTAB_VERSION := 2
 
 ## Filesystem
 BOARD_DATA_DEVICE := /dev/block/mmcblk0p24

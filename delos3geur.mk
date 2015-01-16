@@ -51,11 +51,6 @@ frameworks/native/data/etc/android.hardware.location.xml:system/etc/permissions/
     frameworks/native/data/etc/android.hardware.usb.host.xml:system/etc/permissions/android.hardware.usb.host.xml \
     frameworks/native/data/etc/android.hardware.sensor.light.xml:system/etc/permissions/android.hardware.sensor.light.xml 
 
-## rild
-PRODUCT_PACKAGES := \
-    rild \
-    BasicSmsReceiver
-
 ## Video
 PRODUCT_PACKAGES += \
     libstagefrighthw \
@@ -233,7 +228,6 @@ PRODUCT_COPY_FILES += \
 ADDITIONAL_DEFAULT_PROPERTIES += \
     ro.secure=0 \
     ro.adb.secure=0 \
-    persist.sys.usb.config=mtp,adb \
     ro.debuggable=1 \
     persist.service.adb.enable=1 \
     ro.allow.mock.location=0
@@ -246,19 +240,19 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.vendor.extension_library=/system/lib/libqc-opt.so
 
 ## RIL Properties
-PRODUCT_PROPERTY_OVERRIDES += \
-    rild.libpath=/system/lib/libril-qc-qmi-1.so \
-    ro.telephony.ril.v3=datacall,icccardstatus,facilitylock \
-    ro.telephony.call_ring.multiple=false
+#PRODUCT_PROPERTY_OVERRIDES += \
+#    rild.libpath=/system/lib/libril-qc-qmi-1.so \
+#    ro.telephony.ril.v3=datacall,icccardstatus,facilitylock \
+#    ro.telephony.call_ring.multiple=false
 
 ## RIl Subscripton
 PRODUCT_PROPERTY_OVERRIDES += \
     ril.subscription.types=NV,RUIM \
     ro.telephony.call_ring.delay=3000 \
-    ro.telephony.ril.v3=skippinpukcount,qcomdsds \
-    persist.multisim.config=dsds \
-    persist.radio.multisim.config=dsds \
-    ro.multi.rild=true 
+    ro.telephony.ril.v3=skippinpukcount,qcomdsds
+#    persist.multisim.config=dsds \
+#    persist.radio.multisim.config=dsds \
+#    ro.multi.rild=true 
 
 ## RIL Mor e
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -351,7 +345,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 	ro.carrier=unknown 
 
 $(call inherit-product, build/target/product/full.mk)
-#$(call inherit-product, vendor/samsung/delos3geur/vendor.mk)
+$(call inherit-product, vendor/samsung/delos3geur/vendor.mk)
 
 ## Other
 PRODUCT_BUILD_PROP_OVERRIDES += BUILD_UTC_DATE=0
