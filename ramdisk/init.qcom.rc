@@ -28,9 +28,6 @@
 import init.qcom.usb.rc
 import init.target.rc
 
-on init
-    # Set permissions for persist partition
-    mkdir /persist 0771 system system
 
 on early-boot
     # set RLIMIT_MEMLOCK to 64MB
@@ -38,11 +35,11 @@ on early-boot
 
 on early-init
     mount debugfs debugfs /sys/kernel/debug
-   on init
+on init
     # See storage config details at http://source.android.com/tech/storage/
     mkdir /mnt/shell/emulated 0700 shell shell
     mkdir /storage/emulated 0555 root root
-
+    mkdir /persist 0771 system system
     # External storage directories
     mkdir /mnt/media_rw/sdcard1 0700 media_rw media_rw
 
@@ -65,34 +62,11 @@ on early-init
     symlink /storage/usbdisk /usbdisk
     symlink /storage/usbdisk /mnt/usbdisk
 
-    # for backwards compatibility
-    export EXTERNAL_STORAGE /storage/sdcard0
-    mkdir /storage 0550 system sdcard_r
-    mkdir /storage/sdcard0 0000 system system
-    symlink /storage/sdcard0 /sdcard
-    symlink /storage/sdcard0 /mnt/sdcard
-# map "real" external storages paths also in same way. backwards compatibility.
-    symlink /storage/extSdCard /mnt/extSdCard
-    symlink /storage/UsbDriveA /mnt/UsbDriveA
-    symlink /storage/UsbDriveB /mnt/UsbDriveB
-    symlink /storage/UsbDriveC /mnt/UsbDriveC
-    symlink /storage/UsbDriveD /mnt/UsbDriveD
-    symlink /storage/UsbDriveE /mnt/UsbDriveE
-    symlink /storage/UsbDriveF /mnt/UsbDriveF
-
-    export SECONDARY_STORAGE /storage/extSdCard:/storage/UsbDriveA:/storage/UsbDriveB:/storage/UsbDriveC:/storage/UsbDriveD:/storage/UsbDriveE:/storage/UsbDriveF
-    mkdir /storage/extSdCard 0000 system system
-    mkdir /storage/UsbDriveA 0000 system system
-    mkdir /storage/UsbDriveB 0000 system system
-    mkdir /storage/UsbDriveC 0000 system system
-    mkdir /storage/UsbDriveD 0000 system system
-    mkdir /storage/UsbDriveE 0000 system system
-    mkdir /storage/UsbDriveF 0000 system system
-
 on fs
     ## Mount partitions
     mount_all /fstab.qcom
 
+    
 on boot
     exec system/bin/btnvtool -O
     setprop ro.bt.bdaddr_path "/efs/bluetooth/bt_addr"
@@ -111,6 +85,8 @@ on boot
     chmod 0660 /dev/ttyHS0
     chown bluetooth bluetooth /sys/devices/platform/msm_serial_hs.0/clock
     chmod 0660 /sys/devices/platform/msm_serial_hs.0/clock
+    ## TelephonyManager.java requires this
+    chmod 0644 /proc/cmdline
 
     #Create QMUX deamon socket area
     mkdir /dev/socket/qmux_radio 0770 radio radio
@@ -272,6 +248,9 @@ on post-fs-data
     mkdir /data/time/ 0700 system system
 
     setprop vold.post_fs_data_done 1
+
+service sdcard /system/bin/sdcard -u 1023 -g 1023 -l /data/media /mnt/shell/emulated
+    class late_start
 
 # Export GPIO56 for fusion targets to enable/disable hub
 service usbhub_init /system/bin/usbhub_init
